@@ -1,0 +1,13 @@
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\bin\Debug\TweakJunkies Freemium Utility.exe.config
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\bin\Debug\TweakJunkies Freemium Utility.exe
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\bin\Debug\TweakJunkies Freemium Utility.pdb
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\bin\Debug\CuoreUI.dll
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\bin\Debug\Guna.UI2.dll
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJunkies Freemium Utility.csproj.AssemblyReference.cache
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJunkies_Freemium_Utility.Main.resources
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJunkies_Freemium_Utility.Properties.Resources.resources
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJunkies Freemium Utility.csproj.GenerateResource.cache
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJunkies Freemium Utility.csproj.CoreCompileInputs.cache
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJun.D92267BC.Up2Date
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJunkies Freemium Utility.exe
+C:\Users\honti\Desktop\repos\TweakJunkies Freemium Utility\TweakJunkies Freemium Utility\obj\Debug\TweakJunkies Freemium Utility.pdb
