@@ -1,19 +1,8 @@
-﻿using Guna.UI2.WinForms;
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.ComponentModel;
-using System.Reflection;
-using System.Collections.Generic;
 using Microsoft.Win32;
-using System.IO.Compression;
 
 namespace TweakJunkies_Freemium_Utility
 {
@@ -25,6 +14,15 @@ namespace TweakJunkies_Freemium_Utility
             MainPanel.Visible = false;
             this.DoubleBuffered = true;
         }
+        #region Reg Keys
+        private static RegistryKey EnvVariables = Registry.LocalMachine.OpenSubKey("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment");
+        private static RegistryKey Kernel = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel");
+        private static RegistryKey DWMKey = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm");
+        private static RegistryKey Power = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power");
+        private static RegistryKey WDF01000Params = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wdf01000\Parameters");
+        private static RegistryKey GraphicsDriverScheduler = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler");
+        private static RegistryKey GraphicsDriver = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers");
+        #endregion
         private async void Main_Load(object sender, EventArgs e)
         {
             MainPanel.Visible = false;
@@ -99,206 +97,175 @@ pause
 
         private async void variables_Click(object sender, EventArgs e)
         {
-            string tweaks = @"
-(
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""CONFIG_HZ"" /t REG_SZ /d ""FFFFFFFFFFFFFFFF"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""HZ"" /t REG_SZ /d ""FFFFFFFFFFFFFFFF"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""KERNEL_HZ"" /t REG_SZ /d ""FFFFFFFFFFFFFFFF"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""CPU_MAX_PENDING_INTERRUPTS"" /t REG_SZ /d ""0"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""CPU_MAX_PENDING_IO"" /t REG_SZ /d ""0"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""DWM_MAX_BUFFER_AGE"" /t REG_SZ /d ""0"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""DWM_MAXIMUM_BUFFER_AGE"" /t REG_SZ /d ""0"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""MKL_ENABLE_INSTRUCTIONS"" /t REG_SZ /d ""AVX2"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""DIRECT_GPU"" /t REG_SZ /d ""1"" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"" /v ""DIRECT_CPU"" /t REG_SZ /d ""1"" /f >nul 2>&1
-) >nul 2>&1
-exit
-";
-
-            await Task.Run(() => TweaksFunc(tweaks));
+            EnvVariables.SetValue("CONFIG_HZ", "FFFFFFFFFFFFFFFF", RegistryValueKind.String);
+            EnvVariables.SetValue("HZ", "FFFFFFFFFFFFFFFF", RegistryValueKind.String);
+            EnvVariables.SetValue("KERNEL_HZ", "FFFFFFFFFFFFFFFF", RegistryValueKind.String);
+            EnvVariables.SetValue("CPU_MAX_PENDING_INTERRUPTS", "0", RegistryValueKind.String);
+            EnvVariables.SetValue("CPU_MAX_PENDING_IO", "0", RegistryValueKind.String);
+            EnvVariables.SetValue("DWM_MAX_BUFFER_AGE", "0", RegistryValueKind.String);
+            EnvVariables.SetValue("DWM_MAXIMUM_BUFFER_AGE", "0", RegistryValueKind.String);
+            EnvVariables.SetValue("MKL_ENABLE_INSTRUCTIONS", "AVX2", RegistryValueKind.String);
+            EnvVariables.SetValue("DIRECT_GPU", "1", RegistryValueKind.String);
+            EnvVariables.SetValue("DIRECT_CPU", "1", RegistryValueKind.String);
         }
 
         private async void kernel_Click(object sender, EventArgs e)
         {
-            string tweaks = @"
-(
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""SeTokenSingletonAttributesConfig"" /t REG_DWORD /d 0x00000003 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""obcaseinsensitive"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MitigationOptions"" /t REG_BINARY /d 00000000000000000000000000000000000000000000000000000000000000000000000000000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MitigationAuditOptions"" /t REG_BINARY /d 000000000000000000000000000000000000000000000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""EAFModules"" /t REG_SZ /d """" /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""GlobalTimerResolutionRequests"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DisableExceptionChainValidation"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""SerializeTimerExpiration"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DisableIFEOCaching"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcWatchdogProfileOffset"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""ForceForegroundBoostDecay"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DPCTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcSoftTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcCumulativeSoftTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcWatchdogPeriod"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""VerifierDpcScalingFactor"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""ThreadDpcEnable"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MinimumDpcRate"" /t REG_DWORD /d 0x99999999 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MaximumKernelWorkerThreads"" /t REG_DWORD /d 0x00002000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcRequestRate"" /t REG_DWORD /d 0x99999999 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcTimeLimit"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcTimeCount"" /t REG_DWORD /d 0x0000000a /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""IdleHalt"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""ClockOwner"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""PendingTickFlags"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MaximumDpcQueueDepth"" /t REG_DWORD /d 0x000003e8 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcWatchdogProfileCumulativeDpcThreshold"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcWatchdogProfileSingleDpcThreshold"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcLastCount"" /t REG_DWORD /d 0x000003e8 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcRoutineActive"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""QuantumEnd"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""InterruptLastCount"" /t REG_DWORD /d 0xffffffff /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""InterruptRate"" /t REG_DWORD /d 0x99999999 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""ReadyThreadCount"" /t REG_DWORD /d 0x000000ff /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""KeSpinLockOrdering"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""PriorityState"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DistributeTimers"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DisableDynamicTick"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""TimerInterruptDelay"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MinimumIncrement"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MaximumIncrement"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""PowerOffFrozenProcessors"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DisableLightWeightSuspend"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcQueueDepth"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""AdjustDpcThreshold"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""IdealDpcRate"" /t REG_DWORD /d 0x99999999 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""InterruptSteeringFlags"" /t REG_DWORD /d 0x00000003 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""SchedulerMaximumLatency"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DebugPollInterval"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""HyperStartDisabled"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""SeLpacEnableWatsonReporting"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""SeLpacEnableWatsonThrottling"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""AdminlessEnableWatsonReporting"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""AdminlessEnableWatsonThrottling"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""CyclesPerClockQuantum"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""ForceDpcDmaCoalesce"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DisablePrefetcher"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""LockPagesInMemory"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""KdDisable"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""ThreadPriorityBoost"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""PerfBootPerformance"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""PerfBoostPolicy"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""CpuThrottle"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""SchedulerAssistThreadFlagOverride"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcWatchdogProfileBufferSizeBytes"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DpcWatchdogProfileCumulativeDpcThresholdMs"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""PassiveWatchdogTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""DisableTsx"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""MaximumSharedReadyQueueSize"" /t REG_DWORD /d 0x000000ff /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""ClockRate"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""TimerResolution"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""TSCDeadline"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""UsePlatformClock"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""Clock Rate"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""QuantumLength"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""QuantumSize"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\kernel"" /v ""InterruptRequestRate"" /t REG_DWORD /d 0x99999999 /f >nul 2>&1
-) >nul 2>&1
-
-exit
-";
-
-            await Task.Run(() => TweaksFunc(tweaks));
+            Kernel.SetValue("SeTokenSingletonAttributesConfig",0x00000003);
+            Kernel.SetValue("obcaseinsensitive",0x00000001);
+            byte[] mitigationOptions = new byte[32];
+            byte[] mitigationAuditOptions = new byte[24];
+            Kernel.SetValue("MitigationOptions", mitigationOptions, RegistryValueKind.Binary);
+            Kernel.SetValue("MitigationAuditOptions", mitigationAuditOptions, RegistryValueKind.Binary);
+            Kernel.SetValue("EAFModules", "", RegistryValueKind.String);
+            Kernel.SetValue("GlobalTimerResolutionRequests",0x00000001);
+            Kernel.SetValue("DisableExceptionChainValidation",0x00000000);
+            Kernel.SetValue("SerializeTimerExpiration",0x00000000);
+            Kernel.SetValue("DisableIFEOCaching",0x00000001);
+            Kernel.SetValue("DpcWatchdogProfileOffset",0x00000000);
+            Kernel.SetValue("ForceForegroundBoostDecay",0x00000000);
+            Kernel.SetValue("DPCTimeout",0x00000000);
+            Kernel.SetValue("DpcSoftTimeout",0x00000000);
+            Kernel.SetValue("DpcCumulativeSoftTimeout",0x00000000);
+            Kernel.SetValue("DpcWatchdogPeriod",0x00000000);
+            Kernel.SetValue("VerifierDpcScalingFactor",0x00000001);
+            Kernel.SetValue("ThreadDpcEnable",0x00000001);
+            Kernel.SetValue("MinimumDpcRate",0x99999999);
+            Kernel.SetValue("MaximumKernelWorkerThreads",0x00002000);
+            Kernel.SetValue("DpcRequestRate",0x99999999);
+            Kernel.SetValue("DpcTimeLimit",0x00000000);
+            Kernel.SetValue("DpcTimeCount",0x0000000a);
+            Kernel.SetValue("IdleHalt",0x00000000);
+            Kernel.SetValue("ClockOwner",0x00000001);
+            Kernel.SetValue("PendingTickFlags",0x00000000);
+            Kernel.SetValue("MaximumDpcQueueDepth",0x000003e8);
+            Kernel.SetValue("DpcWatchdogProfileCumulativeDpcThreshold",0x00000000);
+            Kernel.SetValue("DpcWatchdogProfileSingleDpcThreshold",0x00000000);
+            Kernel.SetValue("DpcLastCount",0x000003e8);
+            Kernel.SetValue("DpcRoutineActive",0x00000001);
+            Kernel.SetValue("QuantumEnd",0x00000001);
+            Kernel.SetValue("InterruptLastCount",0xffffffff);
+            Kernel.SetValue("InterruptRate",0x99999999);
+            Kernel.SetValue("ReadyThreadCount",0x000000ff);
+            Kernel.SetValue("KeSpinLockOrdering",0x00000000);
+            Kernel.SetValue("PriorityState",0x00000001);
+            Kernel.SetValue("DistributeTimers",0x00000001);
+            Kernel.SetValue("DisableDynamicTick",0x00000001);
+            Kernel.SetValue("TimerInterruptDelay",0x00000000);
+            Kernel.SetValue("MinimumIncrement",0x00000001);
+            Kernel.SetValue("MaximumIncrement",0x00000001);
+            Kernel.SetValue("PowerOffFrozenProcessors",0x00000000);
+            Kernel.SetValue("DisableLightWeightSuspend",0x00000001);
+            Kernel.SetValue("DpcQueueDepth",0x00000001);
+            Kernel.SetValue("AdjustDpcThreshold",0x00000001);
+            Kernel.SetValue("IdealDpcRate",0x99999999);
+            Kernel.SetValue("InterruptSteeringFlags",0x00000003);
+            Kernel.SetValue("SchedulerMaximumLatency",0x00000000);
+            Kernel.SetValue("DebugPollInterval",0x00000001);
+            Kernel.SetValue("HyperStartDisabled",0x00000001);
+            Kernel.SetValue("SeLpacEnableWatsonReporting",0x00000000);
+            Kernel.SetValue("SeLpacEnableWatsonThrottling",0x00000000);
+            Kernel.SetValue("AdminlessEnableWatsonReporting",0x00000000);
+            Kernel.SetValue("AdminlessEnableWatsonThrottling",0x00000000);
+            Kernel.SetValue("CyclesPerClockQuantum",0x00000001);
+            Kernel.SetValue("ForceDpcDmaCoalesce",0x00000000);
+            Kernel.SetValue("DisablePrefetcher",0x00000001);
+            Kernel.SetValue("LockPagesInMemory",0x00000001);
+            Kernel.SetValue("KdDisable",0x00000001);
+            Kernel.SetValue("ThreadPriorityBoost",0x00000001);
+            Kernel.SetValue("PerfBootPerformance",0x00000001);
+            Kernel.SetValue("PerfBoostPolicy",0x00000001);
+            Kernel.SetValue("CpuThrottle",0x00000000);
+            Kernel.SetValue("SchedulerAssistThreadFlagOverride",0x00000001);
+            Kernel.SetValue("DpcWatchdogProfileBufferSizeBytes",0x00000000);
+            Kernel.SetValue("DpcWatchdogProfileCumulativeDpcThresholdMs",0x00000000);
+            Kernel.SetValue("PassiveWatchdogTimeout",0x00000000);
+            Kernel.SetValue("DisableTsx",0x00000001);
+            Kernel.SetValue("MaximumSharedReadyQueueSize",0x000000ff);
+            Kernel.SetValue("ClockRate",0x00000001);
+            Kernel.SetValue("TimerResolution",0x00000001);
+            Kernel.SetValue("TSCDeadline",0x00000001);
+            Kernel.SetValue("UsePlatformClock",0x00000000);
+            Kernel.SetValue("Clock Rate",0x00000001);
+            Kernel.SetValue("QuantumLength",0x00000001);
+            Kernel.SetValue("QuantumSize",0x00000001);
+            Kernel.SetValue("InterruptRequestRate",0x99999999);
         }
 
         private async void DWM_Click(object sender, EventArgs e)
         {
-            string tweaks = @"
-(
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""AnimationAttributionEnabled"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""AnimationAttributionHashingEnabled"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""OverlayMinFPS"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""BufferCount"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""MaxBufferCount"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""AnimationsShiftKey"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""BackdropBlurCachingThrottleMs"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""ChildWindowDpiIsolation"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""ColorizationColor"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""ColorPrevalence"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""ConfigureInput"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableAdvancedDirectFlip"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableDeviceBitmaps"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableDeviceBitmapsForMultiAdapter"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableDrawListCaching"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableHologramCompositor"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableLockingMemory"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableProjectedShadows"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisableProjectedShadowsRendering"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""DisallowNonDrawListRendering"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""CompositionPolicy"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""Composition"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""MaxOutstandingFrames"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""FlipQueuePolicy"" /t REG_DWORD /d 0x00000004 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm"" /v ""IdleTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-) >nul 2>&1
-exit
-";
-
-            await Task.Run(() => TweaksFunc(tweaks));
+            DWMKey.SetValue("AnimationAttributionEnabled",0x00000000);
+            DWMKey.SetValue("AnimationAttributionHashingEnabled",0x00000000);
+            DWMKey.SetValue("OverlayMinFPS",0x00000000);
+            DWMKey.SetValue("BufferCount",0x00000001);
+            DWMKey.SetValue("MaxBufferCount",0x00000001);
+            DWMKey.SetValue("AnimationsShiftKey",0x00000000);
+            DWMKey.SetValue("BackdropBlurCachingThrottleMs",0x00000000);
+            DWMKey.SetValue("ChildWindowDpiIsolation",0x00000001);
+            DWMKey.SetValue("ColorizationColor",0x00000000);
+            DWMKey.SetValue("ColorPrevalence",0x00000000);
+            DWMKey.SetValue("ConfigureInput",0x00000001);
+            DWMKey.SetValue("DisableAdvancedDirectFlip",0x00000001);
+            DWMKey.SetValue("DisableDeviceBitmaps",0x00000001);
+            DWMKey.SetValue("DisableDeviceBitmapsForMultiAdapter",0x00000001);
+            DWMKey.SetValue("DisableDrawListCaching",0x00000001);
+            DWMKey.SetValue("DisableHologramCompositor",0x00000001);
+            DWMKey.SetValue("DisableLockingMemory",0x00000001);
+            DWMKey.SetValue("DisableProjectedShadows",0x00000001);
+            DWMKey.SetValue("DisableProjectedShadowsRendering",0x00000001);
+            DWMKey.SetValue("DisallowNonDrawListRendering",0x00000001);
+            DWMKey.SetValue("CompositionPolicy",0x00000000);
+            DWMKey.SetValue("Composition",0x00000000);
+            DWMKey.SetValue("MaxOutstandingFrames",0x00000000);
+            DWMKey.SetValue("FlipQueuePolicy",0x00000004);
+            DWMKey.SetValue("IdleTimeout",0x00000000);
         }
 
         private async void specialsauce_Click(object sender, EventArgs e)
         {
-            string tweaks = @"
-(
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcLockWatchdog"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcLockWatchdogTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcLockStatsTelemetryPeriod"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcCriticalTransitionTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcCsEntryAction"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcWcmTransitionTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcCriticalActivatorTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcActivatorClientResponseTimeout"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcActivatorClientPolicyNotificationDebounce"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcCriticalActivatorAction"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power"" /v ""PdcEnforceSystemIdleTimeoutOnConsoleLock"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wdf01000\Parameters"" /v ""WdfDefaultIdleInWorkingState"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wdf01000\Parameters"" /v ""WdfDirectedPowerTransitionEnable"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wdf01000\Parameters"" /v ""IdleInWorkingState"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wdf01000\Parameters"" /v ""WdfDirectedPowerTransitionChildrenOptional"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler"" /v ""HwIndependentFlip"" /t REG_DWORD /d 0x00000002 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler"" /v ""ForegroundPriorityBoost"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler"" /v ""QueuedPresentLimit"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler"" /v ""EnablePreemption"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler"" /v ""FlipOverrideMode"" /t REG_DWORD /d 0x00000003 /f >nul 2>&1
-
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""PlatformSupportMiracast"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""DxgKrnlVersion"" /t REG_DWORD /d 0x00010004 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""MinDxgKrnlVersion"" /t REG_DWORD /d 0x00005013 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""PMMEnable"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""EnablePerformanceMode"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""Capabilities"" /t REG_DWORD /d 0x00000005 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""HwFlipPolicy"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""HwLegacyFlipPolicy"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""TdrLevel"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""TdrDelay"" /t REG_DWORD /d 0x00000005 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""TdrDdiDelay"" /t REG_DWORD /d 0x00000005 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""MaxFrameLatency"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""HwSchMode"" /t REG_DWORD /d 0x00000002 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""FlipOverrideMode"" /t REG_DWORD /d 0x00000003 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""FlipQueuePolicy"" /t REG_DWORD /d 0x00000004 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""FlipModel"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""EnableFlipDiscard"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""DisableDwmVSync"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""DWM_BUFFER_COUNT"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""DwmFlipPolicy"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""DwmQueuePolicy"" /t REG_DWORD /d 0x00000000 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""EnableOfferReclaimOnDriver"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-reg add ""HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v ""ContextNoPatchMode"" /t REG_DWORD /d 0x00000001 /f >nul 2>&1
-) >nul 2>&1
-
-exit
-";
-
-            await Task.Run(() => TweaksFunc(tweaks));
+            Power.SetValue("PdcLockWatchdog",0x00000000);
+            Power.SetValue("PdcLockWatchdogTimeout",0x00000000);
+            Power.SetValue("PdcLockStatsTelemetryPeriod",0x00000000);
+            Power.SetValue("PdcCriticalTransitionTimeout",0x00000000);
+            Power.SetValue("PdcCsEntryAction",0x00000000);
+            Power.SetValue("PdcWcmTransitionTimeout",0x00000000);
+            Power.SetValue("PdcCriticalActivatorTimeout",0x00000000);
+            Power.SetValue("PdcActivatorClientResponseTimeout",0x00000000);
+            Power.SetValue("PdcActivatorClientPolicyNotificationDebounce",0x00000000);
+            Power.SetValue("PdcCriticalActivatorAction",0x00000000);
+            Power.SetValue("PdcEnforceSystemIdleTimeoutOnConsoleLock",0x00000000);
+            WDF01000Params.SetValue("WdfDefaultIdleInWorkingState",0x00000001);
+            WDF01000Params.SetValue("WdfDirectedPowerTransitionEnable",0x00000000);
+            WDF01000Params.SetValue("IdleInWorkingState",0x00000001);
+            WDF01000Params.SetValue("WdfDirectedPowerTransitionChildrenOptional",0x00000000);
+            GraphicsDriverScheduler.SetValue("HwIndependentFlip",0x00000002);
+            GraphicsDriverScheduler.SetValue("ForegroundPriorityBoost",0x00000001);
+            GraphicsDriverScheduler.SetValue("QueuedPresentLimit",0x00000001);
+            GraphicsDriverScheduler.SetValue("EnablePreemption",0x00000001);
+            GraphicsDriverScheduler.SetValue("FlipOverrideMode",0x00000003);
+            GraphicsDriver.SetValue("PlatformSupportMiracast",0x00000001);
+            GraphicsDriver.SetValue("DxgKrnlVersion",0x00010004);
+            GraphicsDriver.SetValue("MinDxgKrnlVersion",0x00005013);
+            GraphicsDriver.SetValue("PMMEnable",0x00000000);
+            GraphicsDriver.SetValue("EnablePerformanceMode",0x00000001);
+            GraphicsDriver.SetValue("Capabilities",0x00000005);
+            GraphicsDriver.SetValue("HwFlipPolicy",0x00000000);
+            GraphicsDriver.SetValue("HwLegacyFlipPolicy",0x00000000);
+            GraphicsDriver.SetValue("TdrLevel",0x00000000);
+            GraphicsDriver.SetValue("TdrDelay",0x00000005);
+            GraphicsDriver.SetValue("TdrDdiDelay",0x00000005);
+            GraphicsDriver.SetValue("MaxFrameLatency",0x00000001);
+            GraphicsDriver.SetValue("HwSchMode",0x00000002);
+            GraphicsDriver.SetValue("FlipOverrideMode",0x00000003);
+            GraphicsDriver.SetValue("FlipQueuePolicy",0x00000004);
+            GraphicsDriver.SetValue("FlipModel",0x00000001);
+            GraphicsDriver.SetValue("EnableFlipDiscard",0x00000001);
+            GraphicsDriver.SetValue("DisableDwmVSync",0x00000001);
+            GraphicsDriver.SetValue("DWM_BUFFER_COUNT",0x00000001);
+            GraphicsDriver.SetValue("DwmFlipPolicy",0x00000000);
+            GraphicsDriver.SetValue("DwmQueuePolicy",0x00000000);
+            GraphicsDriver.SetValue("EnableOfferReclaimOnDriver",0x00000001);
+            GraphicsDriver.SetValue("ContextNoPatchMode",0x00000001);
         }
     }
 }
