@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.IO.Compression;
@@ -6,15 +6,17 @@ using System.Windows.Forms;
 using Guna.UI2.WinForms;
 using System.Threading.Tasks;
 using System.Net.Http;
+using Microsoft.Win32;
 
 namespace TweakJunkies_Freemium_Utility
 {
     public partial class Loading : Form
     {
+        #region strings and reg keys
         private const string DropboxUrl = "https://www.dropbox.com/scl/fi/wml2t8z1ir5ab27uq44g1/RW_Everything_Portable.zip?rlkey=o7hygewdnombjiuqi7tqurruq&st=ntch4jt4&dl=1";
         private const string ExtractFolderPath = @"C:\Program Files\RW Everything Portable";
-        private const string RegistryKeyPath = @"Software\TweakJunkiesFreemiumUtility";
-        private const string RegistryFirstRunValue = "FirstRun";
+        private RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\TweakJunkiesFreemiumUtility");
+        #endregion
 
         public Loading()
         {
@@ -47,14 +49,12 @@ namespace TweakJunkies_Freemium_Utility
 
         private bool IsFirstRun()
         {
-            var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegistryKeyPath);
-            return key == null || key.GetValue(RegistryFirstRunValue) == null;
+            return key == null || key.GetValue("FirstRun") == null;
         }
 
         private void MarkFirstRunCompleted()
         {
-            var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryKeyPath);
-            key.SetValue(RegistryFirstRunValue, "False");
+            key.SetValue("FirstRun", "False");
         }
 
         private async Task DownloadAndExtractFiles()
